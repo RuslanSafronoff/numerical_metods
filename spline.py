@@ -39,7 +39,7 @@ def cubic_spline_coefs(grid):
     return cubic_splines
 
 
-def get_cubic_poly_value_wiki(t, coefs):
+def get_cubic_poly_value(t, coefs):
     T = np.vstack((np.ones(t.shape[0]), (t - coefs[-1]), (t - coefs[-1]) ** 2, (t - coefs[-1]) ** 3))
     return np.dot(coefs[:-1], T)
 
@@ -58,22 +58,6 @@ def cubic_spline_grid(grid, eps=np.float32(0.1)):
         # print(grid_t_extended)
         grid_f_spline = np.append(grid_f_spline, y)
     return np.vstack((grid_t_extended, grid_f_spline))
-
-
-def example(func, a, b, n, N):
-    func_v = np.vectorize(func, otypes=[np.float32])
-    x = np.linspace(a, b, N)
-    y = func_v(x)
-    x_ = np.linspace(a, b, n)
-    y_ = func_v(x_)
-    grid = np.vstack((x_, y_))
-    grid_spline = cubic_spline_grid(grid)
-    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
-    ax1.set_title(r'$Real$')
-    ax1.plot(x, y)
-    ax2.set_title(r'$Welcome \ my \ Spline$')
-    ax2.plot(grid_spline[0], grid_spline[1])
-    f.show()
 
 
 def example_compare(func, label, a, b, n):
@@ -99,7 +83,17 @@ def example_compare(func, label, a, b, n):
     f.show()
 
 
-func = functions.f, functions.g, functions.h
-labels = ['f', 'g', 'h']
-for f, label in zip(func, labels):
-    example_compare(f, label, -5, 5, 20)
+def cubic_spline_plot(grid):
+    grid_spline = cubic_spline_grid(grid)
+    plt.plot(grid_spline[0], grid_spline[1], label="Spline function")
+
+
+def example():
+    func = functions.f, functions.g, functions.h
+    labels = ['f', 'g', 'h']
+    for f, label in zip(func, labels):
+        example_compare(f, label, -5, 5, 20)
+
+
+if __name__ == '__main__':
+    example()
