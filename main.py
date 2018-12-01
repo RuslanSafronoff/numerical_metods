@@ -249,18 +249,17 @@ class Main(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 plt.xlabel(r'$\omega$', fontsize=15)
                 plt.ylabel(r'$\rho(\omega)$', fontsize=15)
                 plt.plot(grid[0], grid[1])
-                plt.show()
             elif info == "s":
                 # plt.title(r'$S(t)$', fontsize=18)
                 plt.xlabel(r'$t$', fontsize=15)
                 plt.ylabel(r'$S(t)$', fontsize=15)
                 plt.plot(grid[0], grid[1])
-                plt.show()
             elif info == "z":
                 plt.xlabel(r'$t$', fontsize=15)
                 plt.ylabel(r'$z(t)$', fontsize=15)
                 plt.plot(grid[0], grid[1])
-                plt.show()
+            plt.grid()
+            plt.show()
             spline.cubic_spline_plot(grid)
     # def s(self, checked=None):
         # dialog = QtWidgets.QApplication()

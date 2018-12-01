@@ -86,6 +86,9 @@ def example_compare(func, label, a, b, n):
 def cubic_spline_plot(grid):
     grid_spline = cubic_spline_grid(grid)
     plt.plot(grid_spline[0], grid_spline[1], label="Spline function")
+    plt.legend(fontsize=15)
+    plt.grid()
+    plt.show()
 
 
 def example():
