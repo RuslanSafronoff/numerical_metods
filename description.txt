@@ -1,0 +1,4 @@
+$f(x) = x^{2} + \log(x) \cdot I_{x > 0.5} + x^{2} \cdot I_{x \leq 0.5}$
+$g(x) = 100\sin(x)$
+$h(x) = x^{4} - 5x^{3} \cdot I_{x < 0.5} + 2\log(x) \cdot I_{x \geq 0.5}$
+$l(x) = x(x - 1)(x - 0.7) + 0.01 \sin(70x)$

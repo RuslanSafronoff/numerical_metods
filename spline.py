@@ -17,7 +17,7 @@ def cubic_spline_coefs(grid):
     Ah = h[:-1]
     Ch = 2 * (h[:-1] + h[1:])
     Bh = h[1:]
-    Fh = 3 * ((A[2:] - A[1:-1]) / h[1:] - (A[1:-1] - A[:-2]) / h[:-1])
+    Fh = 3 * ((A[2:] - A[1:-1]) / h[1:] - (A[1:-1] - A[:-2]) / h[:-1])  # N-2 shape
     alpha = np.full(N - 2, np.float32(0.))
     beta = np.full(N - 2, np.float32(0.))
     alpha[1] = - Bh[0] / Ch[0]
@@ -25,7 +25,6 @@ def cubic_spline_coefs(grid):
     for i in range(2, N - 2):
         alpha[i] = - Bh[i - 1] / (Ah[i - 1] * alpha[i - 1] + Ch[i - 1])
         beta[i] = (Fh[i - 1] - Ah[i - 1] * beta[i - 1]) / (Ah[i - 1] * alpha[i - 1] + Ch[i - 1])
-    C[0], C[-1] = 0., 0.
     C[-2] = (Fh[-1] - Ah[-1] * beta[-1]) / (Ch[-1] + Ah[-1] * alpha[-1])
     for i in range(N - 3):
         C[N - 3 - i] = alpha[N - 3 - i] * C[N - 2 - i] + beta[N - 3 - i]
@@ -36,15 +35,18 @@ def cubic_spline_coefs(grid):
                                np.expand_dims(C[1:], axis=1),
                                np.expand_dims(D[1:], axis=1),
                                np.expand_dims(t[1:], axis=1)))
+    # print(cubic_splines)
     return cubic_splines
 
 
 def get_cubic_poly_value(t, coefs):
+    # print(t.shape)
     T = np.vstack((np.ones(t.shape[0]), (t - coefs[-1]), (t - coefs[-1]) ** 2, (t - coefs[-1]) ** 3))
+    # print(T.shape)
     return np.dot(coefs[:-1], T)
 
 
-def cubic_spline_grid(grid, eps=np.float32(0.1)):
+def cubic_spline_grid(grid, eps=np.float32(10e-5)):
     t = grid[0]
     N = t.shape[0]
     grid_t_extended = np.array([])
@@ -53,6 +55,8 @@ def cubic_spline_grid(grid, eps=np.float32(0.1)):
     for i in range(N - 1):
         # print(N)
         x = np.linspace(t[i], t[i+1], int(ceil((t[i+1] - t[i]) / eps)))
+        # print(t)
+        # print(N)
         y = get_cubic_poly_value(x, cubic_splines[i])
         grid_t_extended = np.append(grid_t_extended, x)
         # print(grid_t_extended)
@@ -60,18 +64,20 @@ def cubic_spline_grid(grid, eps=np.float32(0.1)):
     return np.vstack((grid_t_extended, grid_f_spline))
 
 
-def example_compare(func, label, a, b, n):
+def example_compare(func, label, a, b, n, N):
     func_v = np.vectorize(func, otypes=[np.float32])
     x_ = np.linspace(a, b, n)
     y_ = func_v(x_)
     grid = np.vstack((x_, y_))
     grid_spline = cubic_spline_grid(grid)
     plt.figure(figsize=(20, 10))
-    y = func_v(grid_spline[0])
-    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 10))
-    ax1.plot(grid_spline[0], y, label="Real function {}".format(label))
+    x = np.linspace(a, b, N)
+    y = func_v(x)
+    y_spline = func_v(grid_spline[0])
+    f, (ax1, ax2) = plt.subplots(2, 1, figsize=(20, 20))
+    ax1.plot(x, y, label=label)
     ax1.plot(grid_spline[0], grid_spline[1], label="Spline function of mine")
-    ax2.plot(grid_spline[0], np.abs((grid_spline[1] - y) / y) * 100, label="Error percentage")
+    ax2.plot(grid_spline[0], np.abs(grid_spline[1] - y_spline), label="Error abs.")
     ax1.set_title("Comparison", fontsize=18)
     ax2.set_title("Error", fontsize=18)
     # plt.xlabel("Grid", fontsize=15)
@@ -91,11 +97,20 @@ def cubic_spline_plot(grid):
     plt.show()
 
 
-def example():
-    func = functions.f, functions.g, functions.h
-    labels = ['f', 'g', 'h']
+def example(a=0, b=1, n=20, N=5000):
+    func = functions.f, functions.g, functions.h, functions.l
+    # example_compare(func[-1], 'l', 0, 1, 20, 5000)
+    with open('description.txt', 'r', encoding='utf-8') as g:
+        labels = g.readlines()
     for f, label in zip(func, labels):
-        example_compare(f, label, -5, 5, 20)
+        example_compare(f, label, a, b, n, N)
+    # a = np.array([1, 2, 3])
+    # b = np.array([4, 5, 6])
+    # c = np.array([7, 8, 9])
+    # d = np.hstack((np.expand_dims(a, axis=1),
+    #                            np.expand_dims(b, axis=1),
+    #                            np.expand_dims(c, axis=1)))
+    # print(d[0])
 
 
 if __name__ == '__main__':
