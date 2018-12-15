@@ -46,6 +46,10 @@ def get_cubic_poly_value(t, coefs):
     return np.dot(coefs[:-1], T)
 
 
+def get_poly_offset(t, t0):
+    return t - t0
+
+
 def cubic_spline_grid(grid, eps=np.float32(10e-5)):
     t = grid[0]
     N = t.shape[0]

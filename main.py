@@ -237,6 +237,9 @@ class Main(QMainWindow, design.Ui_MainWindow):
             self.Cauchy.y0 = dialog.doubleSpinBox_y0.value()
             self.Cauchy.T = dialog.doubleSpinBox_t.value()
             self.Cauchy.beta = dialog.doubleSpinBox_beta.value()
+
+    def abc(self, z, rho, S):
+
     # def openSisterWin(self):
     #     # grid = design_s.Ui_MainWindow()
     #     # grid.setupUi(self)
