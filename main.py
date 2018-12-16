@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import spline
+import functions
+import synthesis
 import integration
 import differentiation
 
@@ -174,7 +176,7 @@ class Main(QMainWindow, design.Ui_MainWindow):
         super().__init__()
         self.Param = None
         self.setupUi(self)  # Это нужно для инициализации нашего дизайна
-        self.Cauchy = Cauchy()
+        self.Cauchy = None
         self.S = None
         self.Rho = None
         self.Z = None
@@ -202,6 +204,41 @@ class Main(QMainWindow, design.Ui_MainWindow):
         self.pushButton_z_g.clicked.connect(lambda: self.browse_folder("z"))
         self.pushButton_p.clicked.connect(self.params)
         self.pushButton_cauchy.clicked.connect(self.cauchy_dialog)
+        self.pushButton_example.clicked.connect(self.default)
+
+
+    def default(self):
+        rho, S, z, f = functions.rho, functions.S, functions.z, functions.f
+        scene = QGraphicsScene(self)
+        self.graphicsView.scene = scene
+        self.graphicsView.setScene(scene)
+        # self.graphicsView.scene.clear()
+        # self.graphicsView.viewport().update()
+
+        # axes = figure.gca()
+        figure, ax = plt.subplots(1, 3)
+        # ax.set_title("S-x")
+        # synthesis.optimizer(ax=ax)
+        # ax.grid(True)
+        txy = synthesis.odu()[0]
+        S_v = np.vectorize(S, otypes=[np.float32])
+        ax[1].set_title("S-x")
+        ax[1].plot(txy[1], S_v(txy[0]), label='$S(x)$')
+        # ax[1].legend(fontsize=15)
+        ax[2].set_title("x-t, S-t")
+        ax[2].plot(txy[0], txy[1], label='$x(t)$')
+        ax[2].plot(txy[0], S_v(txy[0]), label='$S(t)$')
+        ax[2].legend(fontsize=15)
+        ax[0].set_title("y-t")
+        ax[0].plot(txy[0], txy[2])
+        # ax[0].legend(fontsize=15)
+        ax[0].grid(True)
+        ax[1].grid(True)
+        ax[2].grid(True)
+        canvas = FigureCanvas(figure)
+        screen = QDesktopWidget().screenGeometry()
+        canvas.setGeometry(0, 0, screen.width(), 400)  # screen.width()
+        scene.addWidget(canvas)
 
     def params(self, checked=None):
         if checked is None:
@@ -237,8 +274,30 @@ class Main(QMainWindow, design.Ui_MainWindow):
             self.Cauchy.y0 = dialog.doubleSpinBox_y0.value()
             self.Cauchy.T = dialog.doubleSpinBox_t.value()
             self.Cauchy.beta = dialog.doubleSpinBox_beta.value()
+            scene = QGraphicsScene(self)
+            self.graphicsView.scene = scene
+            self.graphicsView.setScene(scene)
+            figure, ax = plt.subplots(1, 3)
+            txy = synthesis.odu(T=self.Cauchy.T, x0=self.Cauchy.x0, y0=self.Cauchy.y0, beta=self.Cauchy.beta)
+            S_v = np.vectorize(S, otypes=[np.float32])
+            ax[1].set_title("S-x")
+            ax[1].plot(txy[1], S_v(txy[0]), label='$S(x)$')
+            ax[1].legend(fontsize=15)
+            ax[2].set_title("x-t, S-t")
+            ax[2].plot(txy[0], txy[1], label='$x(t)$')
+            ax[2].plot(txy[0], S_v(txy[0]), label='$S(t)$')
+            ax[2].legend(fontsize=15)
+            ax[0].set_title("y-t")
+            ax[0].plot(txy[0], txy[2])
+            ax[0].legend(fontsize=15)
+            ax[0].grid(True)
+            ax[1].grid(True)
+            ax[2].grid(True)
+            canvas = FigureCanvas(figure)
+            screen = QDesktopWidget().screenGeometry()
+            canvas.setGeometry(0, 0, screen.width(), 400)  # screen.width()
+            scene.addWidget(canvas)
 
-    def abc(self, z, rho, S):
 
     # def openSisterWin(self):
     #     # grid = design_s.Ui_MainWindow()

@@ -102,7 +102,7 @@ def cubic_spline_plot(grid):
 
 
 def example(a=0, b=1, n=20, N=5000):
-    func = functions.f, functions.g, functions.h, functions.l
+    func = functions.f_, functions.g, functions.h, functions.l
     # example_compare(func[-1], 'l', 0, 1, 20, 5000)
     with open('description.txt', 'r', encoding='utf-8') as g:
         labels = g.readlines()

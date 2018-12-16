@@ -8,7 +8,7 @@ def integrate_trapezoidal(grid):
     return (((y[1:] + y[:-1]) / 2) * (x[1:] - x[:-1])).sum()
 
 
-def integrate_trapezoidal_func(f, a, b, N):
+def integrate_trapezoidal_func(f, a, b, N=1000):
     f_v = np.vectorize(f, otypes=[np.float32])
     x = np.linspace(a, b, N)
     y = f_v(x)
@@ -22,7 +22,7 @@ def integrate_simpson(grid):
     return h / 3 * (y[0] + y[-1] + 4 * y[1::2] + 2 * y[2::3])
 
 
-def integrate_simpson_func(f, a, b, N):
+def integrate_simpson_func(f, a, b, N=1000):
     f_v = np.vectorize(f, otypes=[np.float32])
     x = np.linspace(a, b, N)
     y = f_v(x)
@@ -35,7 +35,7 @@ def integrate_plus_spline(f, t, n=1000):
     I = np.zeros(N)
     I[0] = 0
     for i in range(N-1):
-        I[i + 1] = I[i] + integrate_simpson_func(f, t[i], t[i + 1], n)
+        I[i + 1] = I[i] + integrate_trapezoidal_func(f, t[i], t[i + 1], n)
     return spline.cubic_spline_coefs(np.vstack((t, I)))
 
 
